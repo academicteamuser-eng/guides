@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Унификация сборки заданий для верстальщиков на платформе «СберУм»</title>
+  <style>
+    /* === Базовые стили документа === */
+    :root {
+      --color-bg: #fff;
+      --color-text: #222;
+      --color-accent: #0366d6;
+      --color-accent-dark: #024c9c;
+      --color-muted: #555;
+      --color-note-bg: #f5f7fa;
+      --color-note-border: #b3c6ff;
+      --color-example-bg: #e8f1fb;
+      --color-advice-bg: #fef9e7;
+      --color-error-bg: #ffe6e6;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    a:hover,
+    a:focus {
+      text-decoration: underline;
+      outline: none;
+    }
+    h1, h2, h3, h4, h5 {
+      font-weight: 600;
+      margin-top: 2em;
+      margin-bottom: 0.5em;
+      line-height: 1.2;
+      text-align: left;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      border-left: 4px solid var(--color-accent);
+      padding-left: 0.5em;
+      margin-top: 2em;
+    }
+    h3 {
+      font-size: 1.25rem;
+      margin-top: 1.75em;
+    }
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 700; /* полужирный */
+      margin-top: 1.5em;
+    }
+    p {
+      margin: 0.75em 0;
+      max-width: 700px;
+      text-align: left;
+    }
+    em {
+      font-style: italic;
+    }
+    strong {
+      font-weight: 600;
+    }
+
+    /* === Основная сетка === */
+    .container {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 1rem;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      border-right: 1px solid #ddd;
+      padding: 1rem 1rem 3rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      user-select: none;
+    }
+    main {
+      margin-left: 280px;
+      padding: 2rem 2rem 4rem;
+      max-width: 720px;
+      width: 100%;
+    }
+
+    /* === Меню навигации === */
+    nav ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    nav li {
+      margin-bottom: 0.75rem;
+    }
+    nav a {
+      color: var(--color-text);
+      text-decoration: none;
+      display: block;
+      padding: 0.25em 0.4em;
+      border-radius: 3px;
+      transition: background-color 0.2s;
+    }
+    nav a:hover,
+    nav a:focus {
+      background-color: #e0e7ff;
+      outline: none;
+    }
+    nav a.active {
+      background-color: var(--color-accent);
+      color: white;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    nav ul ul {
+      padding-left: 1em;
+      margin-top: 0.3em;
+    }
+
+    /* === Блоки специальных типов (заметки, примеры, советы, ошибки) === */
+    .note {
+      background-color: var(--color-note-bg);
+      border-left: 4px solid var(--color-note-border);
+      padding: 1em 1.25em;
+      margin: 1.5em 0;
+      max-width: 700px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .example {
+      background-color: var(--color-example-bg);
+      border-left: 4px solid #4b7bec;
+      padding: 1em 1.25em;
+      margin: 1.5em 0;
+      font-family: "Courier New", monospace;
+      white-space: pre-wrap;
+      color: #2f4f4f;
+      max-width: 700px;
+    }
+    .advice {
+      background-color: var(--color-advice-bg);
+      border-left: 4px solid #f0d500;
+      padding: 1em 1.25em;
+      margin: 1.5em 0;
+      max-width: 700px;
+    }
+    .error {
+      background-color: var(--color-error-bg);
+      border-left: 4px solid #ff4d4f;
+      padding: 1em 1.25em;
+      margin: 1.5em 0;
+      max-width: 700px;
+    }
+
+    /* === Цитаты === */
+    blockquote {
+      border-left: 4px solid var(--color-accent);
+      margin: 1.5em 0;
+      padding-left: 1em;
+      color: var(--color-muted);
+      font-style: normal;
+      max-width: 700px;
+      text-align: left;
+    }
+    blockquote em.author {
+      display: block;
+      font-style: italic;
+      text-align: right;
+      margin-top: 0.3em;
+      color: var(--color-text);
+      font-size: 0.9rem;
+    }
+    /* Для нескольких цитат с общей линией — если понадобится */
+    blockquote.multi {
+      border-left-width: 6px;
+    }
+    blockquote > p:first-child::before {
+      content: "❝ ";
+      font-weight: bold;
+      font-size: 1.5em;
+      line-height: 0;
+      vertical-align: middle;
+    }
+    blockquote > p {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    blockquote + blockquote {
+      margin-top: 2em;
+    }
+
+    /* === Таблицы === */
+    table {
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      width: 100%;
+      max-width: 700px;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    thead tr {
+      background-color: #f0f0f0;
+    }
+    thead th, tbody td {
+      border: 1px solid #ddd;
+      padding: 0.5em 0.75em;
+      vertical-align: top;
+    }
+    thead th {
+      font-weight: 600;
+      text-align: left;
+    }
+    tbody td.num, tbody th.num {
+      text-align: right;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* === Изображения === */
+    figure {
+      margin: 1.5em 0;
+      max-width: 700px;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+    figcaption {
+      margin-top: 0.3em;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      text-align: left;
+    }
+
+    /* === Списки === */
+    ul, ol {
+      margin: 0.75em 0 0.75em 1.5em;
+      max-width: 700px;
+    }
+    ul ul, ol ol, ul ol, ol ul {
+      margin-left: 1.2em;
+      margin-top: 0.3em;
+      margin-bottom: 0.3em;
+    }
+
+    /* === Курсив для выделения предложений === */
+    .italic {
+      font-style: italic;
+    }
+    /* Полужирное — для слов или выражений */
+    .bold {
+      font-weight: 600;
+    }
+
+    /* === Ссылки всегда открываются в новом окне === */
+    a[href] {
+      cursor: pointer;
+    }
+
+    /* === Адаптивность === */
+    @media (max-width: 900px) {
+      nav {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+      main {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      .container {
+        flex-direction: column;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Навигация -->
+    <nav aria-label="Навигация по разделам">
+      <ul>
+        <li><a href="#intro">Унификация сборки заданий для верстальщиков на платформе «СберУм»</a></li>
+        <li><a href="#nbsp">Неразрывные пробелы</a></li>
+        <li><a href="#alignment">Выравнивание</a></li>
+        <li><a href="#headings">Заголовки</a>
+          <ul>
+            <li><a href="#headings-levels">Соподчинённость заголовков</a></li>
+            <li><a href="#headings-platform">Заголовки на платформе</a></li>
+          </ul>
+        </li>
+        <li><a href="#text-highlighting">Выделение текста</a></li>
+        <li><a href="#lists">Списки</a></li>
+        <li><a href="#colors">Цвет текста</a></li>
+        <li><a href="#quotes">Цитаты</a></li>
+        <li><a href="#images">Изображения</a></li>
+        <li><a href="#video-music">Видео и музыка</a></li>
+        <li><a href="#formulas">Формулы</a></li>
+        <li><a href="#tables">Таблицы</a></li>
+        <li><a href="#gaps">Пропуски</a></li>
+        <li><a href="#links">Ссылки</a></li>
+        <li><a href="#thirdparty">Сторонние конструкторы</a></li>
+        <li><a href="#misc">Прочее</a></li>
+      </ul>
+    </nav>
+
+    <!-- Основной контент -->
+    <main>
+      <h1 id="intro">Унификация сборки заданий для верстальщиков на платформе «СберУм»</h1>
+
+      <section id="nbsp">
+        <h2>Неразрывные пробелы</h2>
+        <p>Перед переносом материала из сценария на платформу необходимо очистить его от неразрывных пробелов. Выглядят они так:</p>
+        <div class="example">
+          &#160; (пример неразрывного пробела)
+        </div>
+        <p>Неразрывные пробелы убираются с помощью замены на обычные.</p>
+        <p>Откройте файл, нажмите кнопку «Заменить», в поле «Найти» вставьте неразрывный пробел (Ctrl + Shift + Пробел), в поле «Заменить на» поставьте обычный пробел и нажмите «Заменить всё».</p>
+      </section>
+
+      <section id="alignment">
+        <h2>Выравнивание</h2>
+        <ul>
+          <li>Текст выравнивается по левому краю;</li>
+          <li>видео — на всю ширину;</li>
+          <li>изображения — по смыслу заданий (по умолчанию — по левому);</li>
+          <li>таблицы — по левому краю, содержимое — см. в разделе с таблицами;</li>
+          <li>заголовки — по левому краю.</li>
+        </ul>
+      </section>
+
+      <section id="headings">
+        <h2>Заголовки</h2>
+        <p>Для удобства читателя заголовки упорядочивают по уровням. Выбор уровня зависит только от структуры текста.</p>
+        <p>Главные, обычно самые крупные, разделы текста оформляются заголовками 1-го уровня, те части, на которые делится каждый главный раздел, имеют заголовки 2-го уровня и т. д.</p>
+        <p>Соподчинённость заголовков должна соблюдаться в рамках одного текста или модуля.</p>
+        <p>При вёрстке опираемся на сценарий, соблюдаем структуру автора. Если выбор уровня заголовка кажется ошибочным, то идём к контент-менеджеру или редактору.</p>
+
+        <section id="headings-levels">
+          <h3>Соподчинённость заголовков</h3>
+          <p>Соподчинённость заголовков должна соблюдаться в рамках одного текста или модуля.</p>
+          <p>При вёрстке опираемся на сценарий, соблюдаем структуру автора. Если выбор уровня заголовка кажется ошибочным, то идём к контент-менеджеру или редактору.</p>
+        </section>
+
+        <section id="headings-platform">
+          <h3>Заголовки на платформе</h3>
+          <p>На платформе возможно выбрать из 5 уровней заголовков:</p>
+          <p>Обычно мы делаем так:</p>
+          <ul>
+            <li>Основные разделы/темы — заголовок 2.</li>
+            <li>Подзаголовки основного раздела — заголовок 3.</li>
+            <li>Названия статей, стихотворений, примеров, инструкций и т. п. — заголовок 4 + полужирный.</li>
+          </ul>
+          <p>Заголовки выравнивание по левому краю. Даже если кажется, что заголовок недостаточно заметный, его не нужно выделять дополнительно (исключение — названия примеров как выше).</p>
+          <p>Если обычные правила выбора заголовка не подходят, обращаемся за советом к контент-менеджеру.</p>
+        </section>
+      </section>
+
+      <section id="text-highlighting">
+        <h2>Выделение текста</h2>
+        <p>При выделении фрагментов текста мы действуем в логике автора, стараемся максимально точно перенести его идеи в верстку.</p>
+        <p><strong>Рекомендации:</strong></p>
+        <ul>
+          <li>Если нужно выделить предложение/абзац, используем <em>курсив</em>;</li>
+          <li>если отдельные слова или несколько слов подряд — <strong>полужирное начертание</strong> или <em>курсив</em>;</li>
+          <li>использовать на одном слове/предложении более одного начертания не рекомендуется.</li>
+        </ul>
+        <p>Также можно выделять полужирным правильный ответ, окончания или ударения, если это требуется по заданию.</p>
+        <p>Капслок для выделения или заголовков, а также наложение курсива и полужирного шрифта не используем совсем.</p>
+      </section>
+
+      <section id="lists">
+        <h2>Списки</h2>
+        <p>Нумерованные списки ставятся только в двух случаях:</p>
+        <ul>
+          <li>важна последовательность;</li>
+          <li>полезно ссылаться на конкретный пункт.</li>
+        </ul>
+        <p>Во всех остальных случаях следует пользоваться маркированным списком (буллиты).</p>
+        <p>Цифру/букву со скобкой не используем совсем.</p>
+        <p>Вложенность списков — один или два уровня.</p>
+      </section>
+
+      <section id="colors">
+        <h2>Цвет текста</h2>
+        <p>Если по заданию какую-то часть текста необходимо выделить цветом, то:</p>
+        <ul>
+          <li>правильный ответ выделяется <strong style="color:green;">зелёным</strong>;</li>
+          <li>неправильный ответ — <strong style="color:red;">красным</strong>;</li>
+          <li>основная часть — жёлтым.</li>
+        </ul>
+        <p>Если по заданию цвет не требуется, то правильный ответ выделяется полужирным.</p>
+        <p>Остальные случаи рассматриваются индивидуально.</p>
+      </section>
+
+      <section id="quotes">
+        <h2>Цитаты</h2>
+        <p>Цитирование из художественных текстов может быть как включено внутрь абзаца с теорией или формулировкой задания, так и стоять отдельно.</p>
+        <p>Если цитата или произведение целиком представляет собой прозаический отрывок и оформляется отдельным абзацем:</p>
+        <blockquote>
+          Добавляем стиль «Цитата» (появится линия слева).<br />
+          Выравниваем цитату по левому краю.<br />
+          Текст цитаты оставляем прямым, добавляем при необходимости акцентные выделения. Кавычки в начале и конце цитаты не ставим.<br />
+          Атрибуты авторства выделяем курсивом, располагаем после текста и боковой линии, выравниваем по правому краю.<br />
+          Атрибуты разделяем точками и указываем в таком порядке: инициалы, фамилия, название и др. Если последнее слово не сокращено, то точка в конце не ставится.
+          <em class="author">И. И. Иванов. «Названия книги»</em>
+        </blockquote>
+        <p>Если подряд стоят несколько цитат из одного произведения:</p>
+        <ul>
+          <li>у них общая боковая линия;</li>
+          <li>общие атрибуты после последней цитаты;</li>
+          <li>каждая цитата начинается с символа ❝ перед началом верхней строки;</li>
+          <li>отступ между цитатами делаем двойной — Shift + Enter.</li>
+        </ul>
+        <p>Если цитата — стихотворение или отрывок из него:</p>
+        <ul>
+          <li>Выравниваем по левому краю.</li>
+          <li>Атрибуты авторства выделяем курсивом, располагаем после текста и выравниваем по левому краю.</li>
+          <li>Атрибуты разделяем точками и указываем в таком порядке: инициалы, фамилия, название и др. Если последнее слово не сокращено, то точка в конце не ставится.</li>
+          <li>В стихотворениях могут быть разные межстрочные интервалы между стихами и строфами. Небольшой интервал (между стихами) делаем с помощью Shift + Enter, стандартный (между строфами) — с помощью Enter.</li>
+          <li>Название стихотворения выделяется заголовком 4 и полужирным.</li>
+          <li>Если название по первой строке, то вместо названия ставятся три звёздочки, которые также оформляются заголовком 4 и полужирным.</li>
+        </ul>
+      </section>
+
+      <section id="images">
+        <h2>Изображения</h2>
+        <p>Мы оформляем изображения одним из трёх способов:</p>
+        <ul>
+          <li>иллюстрации без подписи;</li>
+          <li>иллюстрации с нумерацией: художественные иллюстрации, которые мы создали сами, техническая графика и др.;</li>
+          <li>иллюстрации с атрибуцией: репродукции картин, фото скульптур, архитектурных памятников и др.</li>
+        </ul>
+        <p>Вес картинки не должен превышать 5 Мб.</p>
+        <p>По умолчанию иллюстрации не подписываются.</p>
+        <p>Художественные иллюстрации и техническая графика подписываются словом «Рис.» и порядковым номером, но только если нужно сослаться на рисунок.</p>
+        <figure>
+          <img src="images/example-illustration.jpg" alt="Пример иллюстрации" />
+          <figcaption>Рис. 1. Иллюстрация к заданию</figcaption>
+        </figure>
+        <p>Репродукции картин подписываем так:</p>
+        <p><em>И. С. Глазунов. Мечтатель. Иллюстрация к повести Ф. М. Достоевского «Белые ночи». 1970</em></p>
+        <p>Оформляем все части подписи курсивом и через точку. В конце подписи точку не ставим.</p>
+      </section>
+
+      <section id="video-music">
+        <h2>Видео</h2>
+        <p><em>в разработке</em></p>
+        <ul>
+          <li>Видео должны быть с субтитрами;</li>
+          <li>Вес не более 100 Мб;</li>
+          <li>Желательно название видео.</li>
+        </ul>
+
+        <h2>Музыка</h2>
+        <p><em>в разработке</em></p>
+        <p>Аудио можно добавлять файлом в виджет «Аудио» или как iframe в виджет Iframe или «Текст».</p>
+        <p>Формат подписи для аудио: инициалы, фамилия, название, дата создания.</p>
+        <p>Оформляем все части подписи курсивом и через точку. В конце подписи точку не ставим.</p>
+      </section>
+
+      <section id="formulas">
+        <h2>Формулы</h2>
+        <p>Формулы вводятся через кнопку редактора формул (√х), либо сначала набираются в тексте, а затем выделяются и применяется редактор.</p>
+        <p>В LearningApps формулы работают через $$$$ и html-теги.</p>
+        <p>Всё, что набрано в тексте сценария модуля с помощью редактора формул, должно быть набрано и на платформе с помощью редактора формул.</p>
+        <p>Если в тексте хоть одно число набрано в редакторе формул, то остальные тоже должны быть так набраны, вне зависимости от их вида.</p>
+        <p>Все формулы в тексте, содержащие арифметические знаки, набираются через редактор формул.</p>
+        <p>Все одиночные переменные (или выражения), встречающиеся внутри текста, набираются через редактор формул.</p>
+
+        <p>Пример 1:</p>
+        <div class="example">
+          $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}$$
+        </div>
+        <p>Пример 2:</p>
+        <div class="example">
+          $$E=mc^2$$
+        </div>
+
+        <p>Числа можно набирать без редактора формул только тогда, когда они положительные (минус всегда через редактор), и в тексте не встречается других чисел, которые должны быть оформлены с помощью редактора формул.</p>
+
+        <p>sin, cos и др. не должны быть курсивом, используйте \mathrm{} или \operatorname{}.</p>
+
+        <p>Знаки препинания, которые идут сразу после формулы, помещаются также в редактор формул.</p>
+
+        <p>Градусы: <code>^\circ</code>, градус Цельсия <code>\mathrm{^{\circ}C}</code>, неравенство <code>\ne</code>.</p>
+
+        <p>Для многоэтажных степеней используйте скобки, для больших скобок — \left, \right.</p>
+
+        <p>Для стрелок с текстом: <code>\xrightarrow{текст}</code>, двунаправленных — \overset, \underset.</p>
+
+        <p>Подпись формулы сбоку — <code>\qquad(1)</code>.</p>
+      </section>
+
+      <section id="tables">
+        <h2>Таблицы</h2>
+        <p>Если в таблице есть шапка, выделяем её через стиль (вертикальная или горизонтальная).</p>
+        <p>Текст в шапке выделяется полужирным.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Название</th>
+              <th class="num">Число</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Пример 1</td>
+              <td class="num">123</td>
+              <td>Пояснение</td>
+            </tr>
+            <tr>
+              <td>Пример 2</td>
+              <td class="num">45</td>
+              <td>Дополнение</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Выравнивание:</p>
+        <ul>
+          <li>Заголовок таблицы — по левому краю;</li>
+          <li>Текст в шапке и теле таблицы — по левому краю;</li>
+          <li>Числа — по правому краю;</li>
+          <li>Если колонка содержит и число, и текст — выравнивание, как у текста.</li>
+        </ul>
+
+        <p>Заголовки таблиц размещаем над таблицей.</p>
+      </section>
+
+      <section id="gaps">
+        <h2>Пропуски</h2>
+        <p>Оформление пропусков без автоматической проверки.</p>
+        <ul>
+          <li>Пропуск слова: <code>(...)</code></li>
+          <li>Пропуск буквы: <code>…</code></li>
+          <li>Пропуск числа: <code>…</code></li>
+          <li>Нумерованные пропуски: <code>(цифра)</code></li>
+        </ul>
+        <p>Если предложение заканчивается обозначением пропуска, знаки препинания сохраняются. Например:<br /><em>Одуванчики цветут в начале (...).</em></p>
+      </section>
+
+      <section id="links">
+        <h2>Ссылки</h2>
+        <p>Ссылки всегда должны открываться в новом окне.</p>
+        <p>Ссылки всегда добавляются гиперссылками на слова.</p>
+        <p>Знаки препинания, кроме кавычек, в гиперссылку не включаются.</p>
+        <p>Пример удачной ссылки: <a href="https://example.com" target="_blank" rel="noopener noreferrer">Внешний источник</a></p>
+        <p>Пример неправильной ссылки: (без <code>target="_blank"</code>)</p>
+      </section>
+
+      <section id="thirdparty">
+        <h2>Сторонние конструкторы</h2>
+        <p>Все задания, сделанные вами или авторами на ресурсах типа learning apps, geogebra.org, Desmos и др., — должны быть сохранены в общем аккаунте и добавлены в задание именно из общего аккаунта.</p>
+        <p>Если задание сделано автором, его нужно скопировать и сохранить в общем аккаунте.</p>
+        <p>Изображения в таких заданиях должны быть отрисованы, подобраны художественной редакцией.</p>
+      </section>
+
+      <section id="misc">
+        <h2>Прочее</h2>
+        <p>В таблицах в ячейках не ставятся точки и другие знаки препинания в последних предложениях.</p>
+        <p>В виджетах с автоматической проверкой (тесты, соединение линиями и т. д.) варианты ответа пишутся:</p>
+        <ul>
+          <li>без знаков препинания в конце, если варианты начинаются с маленькой буквы;</li>
+          <li>без знаков препинания в конце, если это не предложения;</li>
+          <li>с точкой на конце, если варианты начинаются с большой буквы и это предложения.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Подсветка активного раздела меню и плавная прокрутка
+
+    const navLinks = document.querySelectorAll('nav a');
+    const sections = [];
+
+    navLinks.forEach(link => {
+      const id = link.getAttribute('href').substring(1);
+      const section = document.getElementById(id);
+      if (section) sections.push(section);
+      // Плавный скролл при клике
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, null, '#' + id);
+      });
+    });
+
+    // Функция для подсветки текущего меню при скролле
+    function onScroll() {
+      const scrollPos = window.scrollY || window.pageYOffset;
+
+      let currentIndex = 0;
+      for (let i = 0; i < sections.length; i++) {
+        if (sections[i].offsetTop - 80 <= scrollPos) {
+          currentIndex = i;
+        } else {
+          break;
+        }
+      }
+      navLinks.forEach(link => link.classList.remove('active'));
+      if (navLinks[currentIndex]) navLinks[currentIndex].classList.add('active');
+    }
+
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('load', onScroll);
+  </script>
+</body>
+</html>
