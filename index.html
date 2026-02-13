@@ -361,6 +361,7 @@
   <!-- Скрытое боковое меню (drawer) -->
   <nav class="drawer" aria-label="Главное меню сайта">
     <h2>Меню сайта</h2>
+    <input type="search" id="drawer-search" placeholder="Поиск..." aria-label="Поиск по меню" style="width: 100%; padding: 0.4em; margin-bottom: 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;">
     <ul>
       <li><a href="index.html" aria-current="page">Унификация сборки заданий</a></li>
       <li><a href="oformlenie-tekstov.html">Оформление текстов</a></li>
@@ -714,6 +715,22 @@
 
     window.addEventListener('scroll', onScroll);
     window.addEventListener('load', onScroll);
+
+    const drawerSearchInput = document.getElementById('drawer-search');
+const drawerMenu = document.querySelector('.drawer ul');
+
+drawerSearchInput.addEventListener('input', () => {
+  const filter = drawerSearchInput.value.toLowerCase();
+  const items = drawerMenu.querySelectorAll('li');
+
+  items.forEach(item => {
+    const link = item.querySelector('a');
+    if (!link) return;
+    const text = link.textContent.toLowerCase();
+    item.style.display = text.includes(filter) ? '' : 'none';
+  });
+});
+    
   </script>
 </body>
 </html>
