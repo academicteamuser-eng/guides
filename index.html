@@ -184,21 +184,22 @@
       min-height: 100vh;
       padding-top: 1rem;
     }
-    /* Постоянная боковая панель (право) */
+    /* Постоянная боковая панель (слева) */
     nav.main-nav {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: 280px;
-      overflow-y: auto;
-      background: #f9f9f9;
-      border-left: 1px solid #ddd;
-      padding: 1rem 1rem 3rem;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      user-select: none;
-    }
+  position: fixed;
+  top: 0;
+  left: 0; /* Смещено слева */
+  height: 100vh;
+  width: 280px;
+  overflow-y: auto;
+  background: #fff; /* белый фон */
+  border-right: 1px solid #ddd; /* можно оставить или убрать */
+  border-left: none; /* убираем если была */
+  padding: 1rem 1rem 3rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  user-select: none;
+}
     nav.main-nav ul {
       list-style: none;
       padding-left: 0;
@@ -231,10 +232,10 @@
       margin-top: 0.3em;
     }
     main.content {
-      margin-right: 280px;
-      padding: 2rem 2rem 4rem;
-      max-width: 720px;
-      width: 100%;
+      margin-left: 280px; /* вместо margin-right */
+  padding: 2rem 2rem 4rem;
+  max-width: 720px;
+  width: 100%;
     }
     /* Скрытое боковое меню (drawer) слева */
     .drawer {
@@ -289,16 +290,26 @@
     /* Кнопка гамбургер */
     .drawer-toggle {
       position: fixed;
-      top: 1rem;
-      left: 1rem;
-      width: 40px;
-      height: 32px;
-      cursor: pointer;
-      z-index: 1100;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  height: 32px;
+  cursor: pointer;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background: #fff; /* белый фон */
+  border: none; /* убираем границы */
+  padding: 0;
+  outline: none;
     }
+
+    .drawer-toggle:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+    
     .drawer-toggle span {
       display: block;
       height: 4px;
@@ -308,9 +319,9 @@
     }
     /* Основной контейнер с отступами слева и справа */
     .wrapper {
-      margin-left: 0; /* учтём отсутствия открытого drawer */
-      transition: margin-left 0.3s ease;
-      width: 100%;
+      margin-left: 0;
+  transition: margin-left 0.3s ease;
+  width: 100%;
     }
     .drawer.open ~ .wrapper {
       margin-left: 280px; /* чтобы не накладываться с drawer */
